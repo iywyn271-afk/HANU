@@ -1,0 +1,6 @@
+{
+  "name": "HANU",
+  "description": "Ứng dụng học tiếng Hàn trực quan toàn diện cho người mới bắt đầu từ Cấp độ 1 đến 6: bảng chữ cái Hangeul, từ vựng, ngữ pháp, phát âm, bài tập trắc nghiệm và tính điểm.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
