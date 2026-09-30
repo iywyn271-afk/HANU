@@ -228,78 +228,57 @@ export const VocabularyView: React.FC<VocabularyViewProps> = ({
     <div className="space-y-6 animate-fadeIn">
       {/* Top Banner & Control Bar */}
       <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-xs space-y-4">
-        {/* Owner Management Banner */}
-        {isOwnerMode ? (
-          <div className="bg-gradient-to-r from-amber-500/10 via-pink-500/10 to-rose-500/10 border border-amber-300 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-pink-500 text-white flex items-center justify-center shrink-0 shadow-xs">
-                <Crown className="w-5 h-5 text-amber-100 fill-amber-100" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs font-black uppercase text-amber-900 tracking-wide">
-                    Quyền Người Sở Hữu Đang Hoạt Động
-                  </span>
-                  <span className="text-[11px] font-bold text-stone-600 bg-white/90 px-2 py-0.5 rounded-full border border-stone-200">
-                    {ownerEmail}
-                  </span>
-                  <span className="text-[11px] font-bold text-pink-700 bg-pink-100 px-2 py-0.5 rounded-full">
-                    {customWords.length} từ đã thêm
-                  </span>
-                </div>
-                <p className="text-xs text-stone-600 mt-0.5">
-                  Bạn có toàn quyền thêm từ vựng mới, chỉnh sửa và đưa vào bài tập học sinh ngay lập tức.
-                </p>
-              </div>
+        {/* Prominent Add Vocab Banner - ALWAYS VISIBLE */}
+        <div className="bg-gradient-to-r from-pink-500/15 via-rose-500/10 to-amber-500/15 border-2 border-pink-300 rounded-3xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-500 text-white flex items-center justify-center shrink-0 shadow-md">
+              <Plus className="w-6 h-6 stroke-[3]" />
             </div>
-
-            <div className="flex items-center gap-2 flex-wrap">
-              <button
-                type="button"
-                onClick={() => {
-                  playClickSound();
-                  setEditingWord(null);
-                  setIsOwnerModalOpen(true);
-                }}
-                className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Thêm từ vựng mới</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  playClickSound();
-                  setIsOwnerModalOpen(true);
-                }}
-                className="px-3.5 py-2 rounded-xl bg-white hover:bg-stone-50 border border-stone-200 text-stone-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
-              >
-                <FolderOpen className="w-3.5 h-3.5 text-amber-600" />
-                <span>Quản lý danh sách ({customWords.length})</span>
-              </button>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm font-black uppercase text-pink-900 tracking-wide">
+                  Chức Năng Thêm Từ Vựng Tiếng Hàn
+                </span>
+                <span className="text-[11px] font-bold text-pink-700 bg-white/90 px-2.5 py-0.5 rounded-full border border-pink-200">
+                  {customWords.length} từ đã thêm
+                </span>
+                <span className="text-[11px] font-semibold text-stone-500">
+                  • Quyền sở hữu: {ownerEmail}
+                </span>
+              </div>
+              <p className="text-xs text-stone-700 mt-1 font-medium">
+                Bấm nút bên cạnh để thêm từ tiếng Hàn mới (có phát âm chuẩn, phiên âm tự động và ví dụ) vào kho từ vựng và bài tập Flashcard!
+              </p>
             </div>
           </div>
-        ) : (
-          <div className="bg-stone-50/80 border border-stone-200 rounded-xl px-3.5 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-            <div className="flex items-center gap-2 text-stone-600">
-              <Crown className="w-4 h-4 text-amber-500" />
-              <span>
-                Bạn là Người sở hữu (<strong>{ownerEmail}</strong>)?
-              </span>
-            </div>
+
+          <div className="flex items-center gap-2.5 flex-wrap shrink-0">
             <button
               type="button"
               onClick={() => {
                 playClickSound();
-                setIsAuthModalOpen(true);
+                setEditingWord(null);
+                setIsOwnerModalOpen(true);
               }}
-              className="font-bold text-pink-600 hover:text-pink-700 hover:underline flex items-center gap-1 cursor-pointer self-start sm:self-auto"
+              className="px-5 py-3 rounded-2xl bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-black text-sm shadow-md hover:shadow-lg flex items-center gap-2 transition-all cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
             >
-              <span>Kích hoạt quyền Thêm Từ Vựng →</span>
+              <Plus className="w-5 h-5 stroke-[2.5]" />
+              <span>➕ THÊM TỪ VỰNG MỚI</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                playClickSound();
+                setIsOwnerModalOpen(true);
+              }}
+              className="px-4 py-3 rounded-2xl bg-white hover:bg-stone-50 border border-stone-200 text-stone-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+            >
+              <FolderOpen className="w-4 h-4 text-amber-600" />
+              <span>Quản lý từ ({customWords.length})</span>
             </button>
           </div>
-        )}
+        </div>
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>

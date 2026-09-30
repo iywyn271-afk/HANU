@@ -62,6 +62,50 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     explanation: 'Cấu trúc biểu thị khả năng làm gì là ~(으)ㄹ 수 있다. 말하다 + ㄹ 수 있어요 = 말할 수 있어요.',
     hint: 'Tìm cấu trúc kết thúc bằng "~(으)ㄹ 수 있어요".'
   },
+  {
+    id: 'q-mc-6',
+    type: 'multiple-choice',
+    level: 3,
+    category: 'Ngữ pháp gián tiếp',
+    question: 'Chọn đuôi câu tường thuật gián tiếp dạng trần thuật hiện tại: "민수 씨가 한국에 ___고 했어요."',
+    options: ['간', '간다', '가자', '가라'],
+    correctAnswer: '간다',
+    explanation: 'Với động từ không có patchim ở thì hiện tại, đuôi trần thuật gián tiếp là ~ㄴ다고 하다 (가다 -> 간다고 하다).',
+    hint: '가다 kết hợp với đuôi ~ㄴ다고 하다.'
+  },
+  {
+    id: 'q-mc-7',
+    type: 'multiple-choice',
+    level: 4,
+    category: 'Ngữ pháp trung cấp',
+    question: 'Điền liên từ biểu thị sự nhượng bộ: "비가 오___ 불구하고 행사를 계속 진행했다."',
+    options: ['는 탓에', '에도', '는데도', '는 바람에'],
+    correctAnswer: '에도',
+    explanation: 'Cấu trúc ~(으)m에도 불구하고 biểu thị sự nhượng bộ "mặc dù... nhưng...".',
+    hint: 'Cụm từ cố định: ~에도 불구하고.'
+  },
+  {
+    id: 'q-mc-8',
+    type: 'multiple-choice',
+    level: 5,
+    category: 'Thành ngữ 4 chữ',
+    question: 'Thành ngữ nào diễn tả ý nghĩa "Khổ trước sướng sau, sau bao gian nan thì hạnh phúc sẽ đến"?',
+    options: ['동문서답', '고진감래', '작심삼일', '일석이조'],
+    correctAnswer: '고진감래',
+    explanation: '"고진감래" (Khổ Tận Cam Lai) nghĩa là hết đắng cay thì vị ngọt ngào sẽ đến.',
+    hint: 'Khổ tận - cam lai.'
+  },
+  {
+    id: 'q-mc-9',
+    type: 'multiple-choice',
+    level: 6,
+    category: 'Thành ngữ triết lý',
+    question: 'Khi muốn khuyên ai đó "Hãy biết đặt mình vào vị trí của người khác để suy nghĩ", ta dùng thành ngữ nào?',
+    options: ['역지사지', '유비무환', '군계일학', '자승자박'],
+    correctAnswer: '역지사지',
+    explanation: '"역지사지" (Dịch Địa Tư Chi) nghĩa là đổi vị trí để suy xét thấu đáo cho đối phương.',
+    hint: 'Dịch địa (đổi chỗ) - tư chi (nghĩ về điều đó).'
+  },
 
   // 2. ĐIỀN TỪ (Fill in the blank)
   {
@@ -131,6 +175,66 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
       { korean: '병원', vietnamese: 'Bệnh viện' }
     ],
     explanation: '지하철: tàu điện ngầm, 식당: nhà hàng ăn uống, 도서관: thư viện, 병원: bệnh viện.'
+  },
+  {
+    id: 'q-mp-3',
+    type: 'match-pairs',
+    level: 3,
+    category: 'Công sở & Hoạt động',
+    question: 'Nối từ tiếng Hàn trung cấp với nghĩa tiếng Việt:',
+    correctAnswer: 'matched',
+    pairs: [
+      { korean: '면접', vietnamese: 'Phỏng vấn' },
+      { korean: '합격하다', vietnamese: 'Trúng tuyển' },
+      { korean: '상담', vietnamese: 'Tư vấn' },
+      { korean: '축제', vietnamese: 'Lễ hội' }
+    ],
+    explanation: '면접: phỏng vấn, 합격하다: đỗ đạt/trúng tuyển, 상담: tư vấn, 축제: lễ hội.'
+  },
+  {
+    id: 'q-mp-4',
+    type: 'match-pairs',
+    level: 4,
+    category: 'Xã hội & Đời sống',
+    question: 'Nối từ vựng xã hội tiếng Hàn với nghĩa tiếng Việt:',
+    correctAnswer: 'matched',
+    pairs: [
+      { korean: '환경보호', vietnamese: 'Bảo vệ môi trường' },
+      { korean: '소비자', vietnamese: 'Người tiêu dùng' },
+      { korean: '고령화', vietnamese: 'Già hóa dân số' },
+      { korean: '대중교통', vietnamese: 'Giao thông công cộng' }
+    ],
+    explanation: '환경보호: bảo vệ môi trường, 소비자: người tiêu dùng, 고령화: già hóa dân số, 대중교통: giao thông công cộng.'
+  },
+  {
+    id: 'q-mp-5',
+    type: 'match-pairs',
+    level: 5,
+    category: 'Thành ngữ bốn chữ',
+    question: 'Nối thành ngữ Hán - Hàn bốn chữ với nghĩa tương ứng:',
+    correctAnswer: 'matched',
+    pairs: [
+      { korean: '일석이조', vietnamese: 'Nhất cử lưỡng tiện' },
+      { korean: '고진감래', vietnamese: 'Khổ tận cam lai' },
+      { korean: '전화위복', vietnamese: 'Chuyển họa thành phúc' },
+      { korean: '동문서답', vietnamese: 'Hỏi đông đáp tây' }
+    ],
+    explanation: '일석이조: một hòn đá trúng 2 con chim, 고진감래: hết khổ đến sướng, 전화위복: trong rủi có may, 동문서답: trả lời lạc đề.'
+  },
+  {
+    id: 'q-mp-6',
+    type: 'match-pairs',
+    level: 6,
+    category: 'Thành ngữ cao cấp',
+    question: 'Nối các thành ngữ triết lý sâu sắc:',
+    correctAnswer: 'matched',
+    pairs: [
+      { korean: '역지사지', vietnamese: 'Đổi chỗ suy nghĩ' },
+      { korean: '유비무환', vietnamese: 'Có phòng ngừa thì không lo' },
+      { korean: '작심삼일', vietnamese: 'Cả thèm chóng chán' },
+      { korean: '군계일학', vietnamese: 'Hạc giữa đàn gà' }
+    ],
+    explanation: '역지사지: đặt mình vào vị trí người khác, 유비무환: hữu bị vô hoạn, 작심삼일: quyết tâm 3 ngày, 군계일학: xuất chúng giữa đám đông.'
   },
 
   // 4. GHÉP CÂU HOÀN CHỈNH (Word Order)
@@ -260,6 +364,130 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     hint: 'Nơi có bác sĩ và y tá khám chữa bệnh khi bạn bị ốm.',
     exampleKr: '감기에 걸려서 병원에 다녀왔어요.',
     exampleVi: 'Tôi bị cảm lạnh nên đã đi bệnh viện về.'
+  },
+  // LEVEL 3 Flashcards
+  {
+    id: 'q-fc-8',
+    type: 'flashcard-vi',
+    level: 3,
+    category: 'Trường học & Công sở',
+    question: 'Xem thẻ từ tiếng Hàn và trả lời nghĩa tiếng Việt tương ứng:',
+    koreanWord: '면접',
+    romanization: 'myeon-jeop',
+    options: ['Phỏng vấn xin việc', 'Họp công ty', 'Thực tập sinh', 'Báo cáo tài chính'],
+    correctAnswer: 'Phỏng vấn xin việc',
+    explanation: '"면접" (Gốc Hán: Diện Tiếp) là buổi phỏng vấn trực tiếp giữa nhà tuyển dụng và ứng viên.',
+    hint: 'Buổi gặp mặt hỏi đáp để ứng tuyển công việc mới.',
+    exampleKr: '내일 대기업 면접을 보러 가요.',
+    exampleVi: 'Ngày mai tôi đi phỏng vấn xin việc ở tập đoàn lớn.'
+  },
+  {
+    id: 'q-fc-9',
+    type: 'flashcard-vi',
+    level: 3,
+    category: 'Xã hội & Đời sống',
+    question: 'Xem thẻ từ tiếng Hàn và trả lời nghĩa tiếng Việt tương ứng:',
+    koreanWord: '축제',
+    romanization: 'chuk-je',
+    options: ['Lễ hội', 'Hội nghị', 'Triển lãm', 'Kỳ nghỉ'],
+    correctAnswer: 'Lễ hội',
+    explanation: '"축제" (Gốc Hán: Chúc Tế) nghĩa là ngày hội, festival tưng bừng kỷ niệm một sự kiện.',
+    hint: 'Sự kiện vui vẻ đông người như lễ hội hoa anh đào, lễ hội pháo hoa.',
+    exampleKr: '봄에는 여의도 벚꽃 축제가 열립니다.',
+    exampleVi: 'Vào mùa xuân lễ hội hoa anh đào Yeouido được tổ chức náo nhiệt.'
+  },
+  // LEVEL 4 Flashcards
+  {
+    id: 'q-fc-10',
+    type: 'flashcard-vi',
+    level: 4,
+    category: 'Xã hội & Đời sống',
+    question: 'Xem thẻ từ tiếng Hàn và trả lời nghĩa tiếng Việt tương ứng:',
+    koreanWord: '환경보호',
+    romanization: 'hwan-gyeong-bo-ho',
+    options: ['Bảo vệ môi trường', 'Phát triển kinh tế', 'Khí hậu biến đổi', 'Tiết kiệm năng lượng'],
+    correctAnswer: 'Bảo vệ môi trường',
+    explanation: '"환경보호" (Gốc Hán: Hoàn Cảnh Bảo Hộ) là hành động gìn giữ và bảo vệ môi trường sinh thái.',
+    hint: 'Hành động chống biến đổi khí hậu và phân loại rác thải.',
+    exampleKr: '지구 온난화를 막기 위해 환경보호가 중요하다.',
+    exampleVi: 'Để ngăn chặn nóng lên toàn cầu, bảo vệ môi trường là rất quan trọng.'
+  },
+  {
+    id: 'q-fc-11',
+    type: 'flashcard-vi',
+    level: 4,
+    category: 'Gia đình & Bản thân',
+    question: 'Xem thẻ từ tiếng Hàn và trả lời nghĩa tiếng Việt tương ứng:',
+    koreanWord: '대인관계',
+    romanization: 'dae-in-gwan-gye',
+    options: ['Quan hệ đối nhân xử thế', 'Quan hệ gia đình', 'Đồng nghiệp cùng phòng', 'Kỹ năng thuyết trình'],
+    correctAnswer: 'Quan hệ đối nhân xử thế',
+    explanation: '"대인관계" (Gốc Hán: Đối Nhân Quan Hệ) chỉ mối quan hệ giữa người với người trong xã hội.',
+    hint: 'Mối quan hệ giao tiếp, ứng xử hài hòa với mọi người xung quanh.',
+    exampleKr: '직장 생활에서는 원만한 대인관계가 필수적이다.',
+    exampleVi: 'Trong cuộc sống công sở, mối quan hệ đối nhân xử thế hòa nhã là điều tất yếu.'
+  },
+  // LEVEL 5 Flashcards
+  {
+    id: 'q-fc-12',
+    type: 'flashcard-vi',
+    level: 5,
+    category: 'Thành ngữ & Triết lý',
+    question: 'Xem thẻ từ tiếng Hàn và trả lời nghĩa tiếng Việt tương ứng:',
+    koreanWord: '고진감래',
+    romanization: 'go-jin-gam-rae',
+    options: ['Khổ tận cam lai (Hết khổ đến sướng)', 'Một mũi tên trúng hai đích', 'Trăm nghe không bằng một thấy', 'Hỏi một đằng trả lời một nẻo'],
+    correctAnswer: 'Khổ tận cam lai (Hết khổ đến sướng)',
+    explanation: '"고진감래" (Khổ Tận Cam Lai): Sau những tháng ngày cay đắng gian nan thì điều ngọt ngào tốt đẹp sẽ tới.',
+    hint: 'Thành ngữ bốn chữ nói về quả ngọt sau chuỗi ngày vất vả nỗ lực.',
+    exampleKr: '긴 고생 끝에 드디어 결실을 맺으니 고진감래다.',
+    exampleVi: 'Sau bao gian khó cuối cùng đã gặt hái thành công, quả là khổ tận cam lai.'
+  },
+  {
+    id: 'q-fc-13',
+    type: 'flashcard-vi',
+    level: 5,
+    category: 'Thành ngữ & Triết lý',
+    question: 'Xem thẻ từ tiếng Hàn và trả lời nghĩa tiếng Việt tương ứng:',
+    koreanWord: '일석이조',
+    romanization: 'il-seok-i-jo',
+    options: ['Một mũi tên trúng hai đích', 'Khổ trước sướng sau', 'Quyết tâm ba ngày', 'Tương thân tương ái'],
+    correctAnswer: 'Một mũi tên trúng hai đích',
+    explanation: '"일석이조" (Nhất Thạch Nhị Điểu): Ném một hòn đá trúng hai con chim, làm một việc được hai lợi ích.',
+    hint: 'Làm một việc đạt được hai mục đích tốt đẹp cùng lúc.',
+    exampleKr: '운동도 하고 스트레스도 푸니 일석이조다.',
+    exampleVi: 'Vừa rèn luyện thân thể lại vừa giải tỏa stress đúng là một công đôi việc.'
+  },
+  // LEVEL 6 Flashcards
+  {
+    id: 'q-fc-14',
+    type: 'flashcard-vi',
+    level: 6,
+    category: 'Thành ngữ & Triết lý',
+    question: 'Xem thẻ từ tiếng Hàn và trả lời nghĩa tiếng Việt tương ứng:',
+    koreanWord: '역지사지',
+    romanization: 'yeok-ji-sa-ji',
+    options: ['Đặt mình vào vị trí người khác để thấu hiểu', 'Có chuẩn bị thì không lo hoạn nạn', 'Thay da đổi thịt hoàn toàn', 'Trăm nghe không bằng một thấy'],
+    correctAnswer: 'Đặt mình vào vị trí người khác để thấu hiểu',
+    explanation: '"역지사지" (Dịch Địa Tư Chi): Đổi vị trí của mình sang đối phương để suy nghĩ và thấu hiểu lý do của họ.',
+    hint: 'Đặt mình vào hoàn cảnh của người khác khi giải quyết mâu thuẫn.',
+    exampleKr: '상대방의 입장에서 역지사지해보면 갈등을 쉽게 풀 수 있다.',
+    exampleVi: 'Nếu biết đặt mình vào góc nhìn của đối phương để suy nghĩ, bất đồng sẽ được hóa giải dễ dàng.'
+  },
+  {
+    id: 'q-fc-15',
+    type: 'flashcard-vi',
+    level: 6,
+    category: 'Thành ngữ & Triết lý',
+    question: 'Xem thẻ từ tiếng Hàn và trả lời nghĩa tiếng Việt tương ứng:',
+    koreanWord: '유비무환',
+    romanization: 'yu-bi-mu-hwan',
+    options: ['Có chuẩn bị trước thì không lo hoạn nạn', 'Ngọc lớn thành muộn', 'Nói một đằng làm một nẻo', 'Hạc giữa bầy gà'],
+    correctAnswer: 'Có chuẩn bị trước thì không lo hoạn nạn',
+    explanation: '"유비무환" (Hữu Bị Vô Hoạn): Chuẩn bị kỹ càng mọi phương án từ trước thì không bao giờ phải lo sợ tai họa bất ngờ.',
+    hint: 'Lập kế hoạch phòng ngừa rủi ro chu đáo.',
+    exampleKr: '미리 대비책을 세우는 것은 유비무환의 자세이다.',
+    exampleVi: 'Lập kế hoạch phòng ngừa trước chính là thái độ hữu bị vô hoạn.'
   }
 ];
 

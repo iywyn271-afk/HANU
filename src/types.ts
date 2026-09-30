@@ -5,6 +5,7 @@ export type AppTab =
   | 'grammar' 
   | 'pronunciation' 
   | 'practice' 
+  | 'games'
   | 'stats';
 
 export interface LevelInfo {
@@ -67,6 +68,9 @@ export interface GrammarLesson {
     vi: string;
   }[];
   tip?: string;
+  isCustom?: boolean;
+  createdBy?: string;
+  createdAt?: string;
 }
 
 export interface DialogueLine {
@@ -120,6 +124,9 @@ export interface QuizQuestion {
   wordBlocks?: string[]; // For word-order
   exampleKr?: string;
   exampleVi?: string;
+  isCustom?: boolean;
+  createdBy?: string;
+  createdAt?: string;
 }
 
 export interface UserStats {
@@ -144,3 +151,81 @@ export interface AchievementBadge {
   progress: number;
   maxProgress: number;
 }
+
+export type AgeBracket = 'kids' | 'teens' | 'young-adult' | 'adult' | 'senior';
+
+export type ThemeId = 
+  | 'cherry'     // Hoa đào Seoul (Hồng phấn & Rose)
+  | 'mint'       // Trà xanh Jeju (Emerald & Mint)
+  | 'ocean'      // Biển Busan (Cyan & Ocean Blue)
+  | 'gold'       // Hoàng gia Hanbok (Amber & Gold)
+  | 'lavender'   // K-Pop Vibe (Tím & Neon Violet)
+  | 'sunset'     // Quýt vàng Jeju (Cam & Coral)
+  | 'midnight';  // Trăng đêm Hanok (Slate & Indigo)
+
+export interface UserPreferences {
+  hasCompletedOnboarding: boolean;
+  ageBracket: AgeBracket;
+  learningGoal: string;
+  dailyTimeMinutes: number;
+  themeId: ThemeId;
+}
+
+export interface ThemeConfig {
+  id: ThemeId;
+  name: string;
+  subTitle: string;
+  emoji: string;
+  recommendedFor: string;
+  ageMatch: AgeBracket[];
+  accentColor: string;
+  gradientFrom: string;
+  gradientTo: string;
+  gradientClass: string;
+  bgLight: string;
+  borderClass: string;
+  badgeBgClass: string;
+  badgeTextClass: string;
+  primaryBtnClass: string;
+  hoverBtnClass: string;
+  ringClass: string;
+}
+
+export interface QuizLeaderboardEntry {
+  id: string;
+  playerName: string;
+  playerAvatar: string;
+  score: number;
+  totalQuestions: number;
+  timeSpentSeconds: number;
+  completedAt: string;
+  badge?: string;
+  isCurrentUser?: boolean;
+}
+
+export interface SharedQuizSet {
+  id: string;
+  code: string; // e.g. "HANU-TOPIK", "KPOP-IDOL", "TRAVEL-KR", "BIZ-KOREA", "HANJA-PRO"
+  title: string;
+  subTitle: string;
+  category: string;
+  difficulty: 'Dễ' | 'Trung bình' | 'Khó' | 'Thử thách';
+  icon: string;
+  questionsCount: number;
+  participantsCount: number;
+  author: string;
+  questions: QuizQuestion[];
+  isCommunity?: boolean;
+  defaultLeaderboard: QuizLeaderboardEntry[];
+}
+
+export interface QuizRoom {
+  code: string;
+  quizSetId: string;
+  quizTitle: string;
+  createdBy: string;
+  createdAt: string;
+  participants: QuizLeaderboardEntry[];
+}
+
+

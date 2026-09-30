@@ -78,7 +78,7 @@ export const OwnerAuthModal: React.FC<OwnerAuthModalProps> = ({
             {isOwnerMode ? 'Chế Độ Người Sở Hữu Đang Bật' : 'Xác Nhận Quyền Người Sở Hữu'}
           </h3>
           <p className="text-xs text-white/90 mt-1">
-            Quyền thêm, sửa và quản lý từ vựng tiếng Hàn vào ứng dụng.
+            Quyền thêm, sửa và quản lý từ vựng, ngữ pháp và đề thi quiz tiếng Hàn vào ứng dụng.
           </p>
         </div>
 
@@ -95,7 +95,7 @@ export const OwnerAuthModal: React.FC<OwnerAuthModalProps> = ({
                   Email sở hữu: <strong className="text-stone-900">{ownerEmail}</strong>
                 </p>
                 <p className="text-stone-500 text-[11px]">
-                  Bạn có toàn quyền thêm từ vựng mới, chỉnh sửa, xóa và tải file sao lưu JSON bất cứ lúc nào.
+                  Bạn có toàn quyền thêm từ vựng, bài học ngữ pháp, câu hỏi quiz mới, chỉnh sửa, xóa và tải file sao lưu JSON bất cứ lúc nào.
                 </p>
               </div>
 

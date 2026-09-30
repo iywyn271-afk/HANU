@@ -6,8 +6,13 @@ import {
   Sparkles, 
   CheckCircle2, 
   Search,
-  BookOpen
+  BookOpen,
+  Plus,
+  Crown,
+  Edit3,
+  Trash2
 } from 'lucide-react';
+import { GrammarLesson } from '../types';
 import { GRAMMAR_LESSONS } from '../data/grammarData';
 import { speakKorean, playClickSound } from '../utils/audio';
 
@@ -15,17 +20,30 @@ interface GrammarViewProps {
   selectedLevel: number;
   onSelectLevel: (lvl: number) => void;
   speechRate: number;
+  customGrammar?: GrammarLesson[];
+  onOpenAddGrammar?: () => void;
+  onEditGrammar?: (item: GrammarLesson) => void;
+  onDeleteGrammar?: (id: string) => void;
+  isOwnerMode?: boolean;
 }
 
 export const GrammarView: React.FC<GrammarViewProps> = ({
   selectedLevel,
   onSelectLevel,
-  speechRate
+  speechRate,
+  customGrammar = [],
+  onOpenAddGrammar,
+  onEditGrammar,
+  onDeleteGrammar,
+  isOwnerMode = false
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [expandedId, setExpandedId] = useState<string | null>('g1-1');
 
-  const filteredGrammar = GRAMMAR_LESSONS.filter((item) => {
+  // Merge custom grammar created by owner with built-in lessons
+  const allGrammar: GrammarLesson[] = [...customGrammar, ...GRAMMAR_LESSONS];
+
+  const filteredGrammar = allGrammar.filter((item) => {
     const matchLevel = selectedLevel === 0 || item.level === selectedLevel;
     const q = searchQuery.toLowerCase().trim();
     const matchSearch = !q ||
@@ -57,10 +75,21 @@ export const GrammarView: React.FC<GrammarViewProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-white border border-pink-200 text-pink-700 shadow-2xs">
             {filteredGrammar.length} cấu trúc ngữ pháp
           </span>
+
+          {onOpenAddGrammar && (
+            <button
+              onClick={onOpenAddGrammar}
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+              title="Thêm cấu trúc ngữ pháp mới"
+            >
+              <Plus className="w-3.5 h-3.5 stroke-[3]" />
+              <span>Thêm Ngữ Pháp</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -76,7 +105,7 @@ export const GrammarView: React.FC<GrammarViewProps> = ({
                 playClickSound();
                 onSelectLevel(lvl);
               }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 selectedLevel === lvl
                   ? 'bg-pink-500 text-white shadow-xs'
                   : 'bg-white border border-stone-200 text-stone-700 hover:border-pink-300'
@@ -107,7 +136,11 @@ export const GrammarView: React.FC<GrammarViewProps> = ({
           return (
             <div
               key={lesson.id}
-              className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-xs hover:border-pink-300 transition-all"
+              className={`bg-white rounded-2xl border transition-all overflow-hidden shadow-xs ${
+                lesson.isCustom
+                  ? 'border-amber-300 ring-1 ring-amber-200'
+                  : 'border-stone-200 hover:border-pink-300'
+              }`}
             >
               {/* Card Header */}
               <div
@@ -118,13 +151,19 @@ export const GrammarView: React.FC<GrammarViewProps> = ({
                 className="p-5 cursor-pointer flex items-center justify-between gap-4 select-none hover:bg-stone-50/50"
               >
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="px-2 py-0.5 rounded-md bg-pink-100 text-pink-700 font-bold text-xs">
                       Cấp {lesson.level}
                     </span>
                     <span className="font-mono text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
                       {lesson.pattern}
                     </span>
+                    {lesson.isCustom && (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1 shadow-2xs">
+                        <Crown className="w-3 h-3 text-amber-600 fill-amber-500" />
+                        <span>Chủ sở hữu thêm</span>
+                      </span>
+                    )}
                   </div>
                   <h3 className="text-base sm:text-lg font-bold text-stone-900">
                     {lesson.title}
@@ -134,9 +173,38 @@ export const GrammarView: React.FC<GrammarViewProps> = ({
                   </p>
                 </div>
 
-                <button className="text-xs font-bold text-pink-600 bg-pink-50 px-3 py-1.5 rounded-xl shrink-0">
-                  {isExpanded ? 'Thu gọn ▲' : 'Xem chi tiết ▼'}
-                </button>
+                <div className="flex items-center gap-2 shrink-0">
+                  {lesson.isCustom && isOwnerMode && (
+                    <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                      {onEditGrammar && (
+                        <button
+                          onClick={() => onEditGrammar(lesson)}
+                          className="p-2 rounded-xl border border-stone-200 bg-white hover:bg-stone-100 text-stone-700 transition-colors cursor-pointer"
+                          title="Sửa bài ngữ pháp này"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      {onDeleteGrammar && (
+                        <button
+                          onClick={() => {
+                            if (window.confirm(`Bạn có chắc chắn muốn xóa bài ngữ pháp "${lesson.title}"?`)) {
+                              onDeleteGrammar(lesson.id);
+                            }
+                          }}
+                          className="p-2 rounded-xl border border-rose-200 bg-white hover:bg-rose-50 text-rose-600 transition-colors cursor-pointer"
+                          title="Xóa bài ngữ pháp này"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  <button className="text-xs font-bold text-pink-600 bg-pink-50 px-3 py-1.5 rounded-xl shrink-0 cursor-pointer">
+                    {isExpanded ? 'Thu gọn ▲' : 'Xem chi tiết ▼'}
+                  </button>
+                </div>
               </div>
 
               {/* Card Collapsible Body */}
@@ -188,15 +256,14 @@ export const GrammarView: React.FC<GrammarViewProps> = ({
                           key={i}
                           className="flex items-center justify-between p-3 rounded-xl bg-stone-50 border border-stone-100 hover:bg-pink-50/50 transition-colors"
                         >
-                          <div>
-                            <div className="font-korean font-bold text-stone-900 text-sm sm:text-base">
+                          <div className="space-y-0.5">
+                            <p className="font-korean font-bold text-sm text-stone-900">
                               {ex.kr}
-                            </div>
-                            <div className="text-xs text-stone-600 mt-0.5">
+                            </p>
+                            <p className="text-xs text-stone-500">
                               {ex.vi}
-                            </div>
+                            </p>
                           </div>
-
                           <button
                             onClick={() => handleSpeak(ex.kr)}
                             title="Nghe câu mẫu"

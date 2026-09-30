@@ -18,10 +18,14 @@ import {
   Eye,
   EyeOff,
   PenTool,
-  RotateCw
+  RotateCw,
+  Plus,
+  Users
 } from 'lucide-react';
-import { QuizQuestion, QuizType, VocabWord } from '../types';
+import { QuizQuestion, QuizType, VocabWord, ThemeId } from '../types';
 import { QUIZ_QUESTIONS } from '../data/quizData';
+import { SHARED_QUIZ_SETS } from '../data/sharedQuizzesData';
+import { SharedQuizArena } from './SharedQuizArena';
 import { 
   playCorrectSound, 
   playWrongSound, 
@@ -37,7 +41,11 @@ interface PracticeViewProps {
   onQuizCompleted: (correctCount: number, totalCount: number) => void;
   speechRate: number;
   playerName?: string;
+  playerAvatar?: string;
+  themeId?: ThemeId;
   customWords?: VocabWord[];
+  customQuizzes?: QuizQuestion[];
+  onOpenAddQuiz?: () => void;
 }
 
 export const PracticeView: React.FC<PracticeViewProps> = ({
@@ -46,9 +54,14 @@ export const PracticeView: React.FC<PracticeViewProps> = ({
   onAddXP,
   onQuizCompleted,
   speechRate,
-  playerName,
-  customWords = []
+  playerName = 'Học viên',
+  playerAvatar = '🌸',
+  themeId = 'cherry',
+  customWords = [],
+  customQuizzes = [],
+  onOpenAddQuiz
 }) => {
+  const [practiceTab, setPracticeTab] = useState<'shared-arena' | 'solo-practice'>('shared-arena');
   const [activeTypeFilter, setActiveTypeFilter] = useState<'all' | QuizType>('all');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   
@@ -110,8 +123,8 @@ export const PracticeView: React.FC<PracticeViewProps> = ({
   }, [customWords]);
 
   const allQuestions = React.useMemo(() => {
-    return [...customQuestions, ...QUIZ_QUESTIONS];
-  }, [customQuestions]);
+    return [...(customQuizzes || []), ...customQuestions, ...QUIZ_QUESTIONS];
+  }, [customQuizzes, customQuestions]);
 
   // Filter questions
   const filteredQuestions = allQuestions.filter((q) => {
@@ -351,6 +364,91 @@ export const PracticeView: React.FC<PracticeViewProps> = ({
 
   return (
     <div className="space-y-6 animate-fadeIn">
+      {/* Mode Switcher: Shared Arena vs Solo Practice */}
+      <div className="flex items-center gap-2 p-1.5 bg-stone-100 rounded-2xl border border-stone-200">
+        <button
+          type="button"
+          onClick={() => {
+            playClickSound();
+            setPracticeTab('shared-arena');
+          }}
+          className={`flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${
+            practiceTab === 'shared-arena'
+              ? 'bg-white text-stone-900 shadow-sm ring-1 ring-black/5'
+              : 'text-stone-600 hover:text-stone-900'
+          }`}
+        >
+          <Users className="w-4 h-4 text-pink-600" />
+          <span>👥 Đấu Trường Quiz Cùng Dùng ({SHARED_QUIZ_SETS.length} bộ đề)</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            playClickSound();
+            setPracticeTab('solo-practice');
+          }}
+          className={`flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${
+            practiceTab === 'solo-practice'
+              ? 'bg-white text-stone-900 shadow-sm ring-1 ring-black/5'
+              : 'text-stone-600 hover:text-stone-900'
+          }`}
+        >
+          <Layers className="w-4 h-4 text-emerald-600" />
+          <span>🎯 Luyện Tập Tự Do Theo Cấp Độ (Cấp {selectedLevel})</span>
+        </button>
+      </div>
+
+      {practiceTab === 'shared-arena' ? (
+        <SharedQuizArena
+          playerName={playerName}
+          playerAvatar={playerAvatar}
+          speechRate={speechRate}
+          themeId={themeId}
+          onAddXP={onAddXP}
+          customQuizzes={customQuizzes}
+          onOpenCreateQuiz={onOpenAddQuiz}
+        />
+      ) : (
+        <>
+          {/* Create Quiz Prominent Action Banner */}
+          <div className="bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border border-emerald-300 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+            <HelpCircle className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-black uppercase text-emerald-900 tracking-wide">
+                Ngân Hàng Bài Tập & Quiz HANU
+              </span>
+              {customQuizzes && customQuizzes.length > 0 && (
+                <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-200">
+                  +{customQuizzes.length} câu tự tạo
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-stone-600 mt-0.5">
+              Bạn có thể tự tạo thêm câu hỏi Trắc nghiệm, Điền từ, Flashcard, Nối từ hoặc Ghép câu vào đề bài!
+            </p>
+          </div>
+        </div>
+
+        {onOpenAddQuiz && (
+          <button
+            type="button"
+            onClick={() => {
+              playClickSound();
+              onOpenAddQuiz();
+            }}
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition-all cursor-pointer self-start sm:self-auto shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            <span>➕ Tạo câu hỏi Quiz mới</span>
+          </button>
+        )}
+      </div>
+
       {/* Quiz Top Control Banner */}
       <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -1091,6 +1189,8 @@ export const PracticeView: React.FC<PracticeViewProps> = ({
             </div>
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );
