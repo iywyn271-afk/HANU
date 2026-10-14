@@ -3,10 +3,10 @@ import { ThemeConfig, ThemeId, AgeBracket } from '../types';
 export const THEME_CONFIGS: Record<ThemeId, ThemeConfig> = {
   cherry: {
     id: 'cherry',
-    name: 'Hoa Đào Seoul',
-    subTitle: 'Hồng phấn & Rose ngọt ngào tinh tế',
+    name: 'Hồng',
+    subTitle: 'Tone màu hồng dịu dàng & tươi trẻ',
     emoji: '🌸',
-    recommendedFor: 'Phù hợp: Sinh viên & Giới trẻ yêu thích vẻ đẹp lãng mạn Hàn Quốc',
+    recommendedFor: 'Phù hợp: Sinh viên & Giới trẻ yêu thích vẻ đẹp ngọt ngào',
     ageMatch: ['young-adult', 'teens', 'kids'],
     accentColor: '#ec4899',
     gradientFrom: '#ec4899',
@@ -22,10 +22,10 @@ export const THEME_CONFIGS: Record<ThemeId, ThemeConfig> = {
   },
   mint: {
     id: 'mint',
-    name: 'Trà Xanh Jeju',
-    subTitle: 'Xanh thảo mộc thư thái & dịu mắt',
+    name: 'Xanh Lá',
+    subTitle: 'Tone màu xanh lá thư thái & dịu mắt',
     emoji: '🌿',
-    recommendedFor: 'Phù hợp: Người đi làm, nhân viên văn phòng, học ban đêm thư giãn',
+    recommendedFor: 'Phù hợp: Người đi làm, nhân viên văn phòng, học ban đêm',
     ageMatch: ['adult', 'senior'],
     accentColor: '#10b981',
     gradientFrom: '#10b981',
@@ -41,8 +41,8 @@ export const THEME_CONFIGS: Record<ThemeId, ThemeConfig> = {
   },
   ocean: {
     id: 'ocean',
-    name: 'Biển Xanh Busan',
-    subTitle: 'Sóng biển đại dương tươi mát & hiện đại',
+    name: 'Xanh Dương',
+    subTitle: 'Tone màu xanh dương đại dương tươi mới & hiện đại',
     emoji: '🌊',
     recommendedFor: 'Phù hợp: Học sinh & Sinh viên năng động, tạo cảm hứng tươi mới',
     ageMatch: ['young-adult', 'teens'],
@@ -60,8 +60,8 @@ export const THEME_CONFIGS: Record<ThemeId, ThemeConfig> = {
   },
   gold: {
     id: 'gold',
-    name: 'Hoàng Cung Hanbok',
-    subTitle: 'Vàng kim & Amber quý phái, độ tương phản cao',
+    name: 'Vàng',
+    subTitle: 'Tone màu vàng kim ấm áp, chữ rõ nét dễ đọc',
     emoji: '👑',
     recommendedFor: 'Phù hợp: Người trưởng thành & trung niên, chữ nổi bật, dễ đọc',
     ageMatch: ['senior', 'adult'],
@@ -79,8 +79,8 @@ export const THEME_CONFIGS: Record<ThemeId, ThemeConfig> = {
   },
   lavender: {
     id: 'lavender',
-    name: 'K-Pop Vibe',
-    subTitle: 'Tím Lavender & Cyber Berry thời thượng',
+    name: 'Tím',
+    subTitle: 'Tone màu tím thời thượng & trẻ trung',
     emoji: '🍇',
     recommendedFor: 'Phù hợp: Gen Z & Fan K-Pop, thần tượng âm nhạc Hàn Quốc',
     ageMatch: ['teens', 'young-adult'],
@@ -98,10 +98,10 @@ export const THEME_CONFIGS: Record<ThemeId, ThemeConfig> = {
   },
   sunset: {
     id: 'sunset',
-    name: 'Quýt Vàng Hallabong',
-    subTitle: 'Cam tươi & San hô rực rỡ, vui tươi tràn đầy năng lượng',
+    name: 'Cam',
+    subTitle: 'Tone màu cam tươi sáng & tràn đầy năng lượng',
     emoji: '🍊',
-    recommendedFor: 'Phù hợp: Thiếu nhi & Trẻ em, khơi gợi hào hứng và niềm vui học tập',
+    recommendedFor: 'Phù hợp: Thiếu nhi & Trẻ em, khơi gợi hào hứng học tập',
     ageMatch: ['kids'],
     accentColor: '#f97316',
     gradientFrom: '#f97316',
@@ -117,8 +117,8 @@ export const THEME_CONFIGS: Record<ThemeId, ThemeConfig> = {
   },
   midnight: {
     id: 'midnight',
-    name: 'Trăng Đêm Hanok',
-    subTitle: 'Slate & Xám than tối giản, sang trọng thanh lịch',
+    name: 'Xám Đen',
+    subTitle: 'Tone màu xám đen tối giản & thanh lịch',
     emoji: '🌙',
     recommendedFor: 'Phù hợp: Người yêu thích phong cách tối giản, bảo vệ mắt tối đa',
     ageMatch: ['adult', 'senior'],
@@ -148,35 +148,35 @@ export const AGE_BRACKET_INFO: Record<AgeBracket, {
     sub: 'Hình ảnh sinh động, kẹo ngọt vui vẻ',
     emoji: '🧒',
     recommendedTheme: 'sunset',
-    description: 'Tone màu ấm áp, tươi vui như quả quýt Hallabong giúp bé hào hứng mỗi ngày.'
+    description: 'Tone màu Cam tươi sáng giúp bé hào hứng và thích thú mỗi ngày.'
   },
   teens: {
     label: '12 - 18 tuổi (Học sinh / Gen Z)',
-    sub: 'Đu Idol K-Pop, năng động & thời thượng',
+    sub: 'Năng động, trẻ trung & thời thượng',
     emoji: '🎒',
     recommendedTheme: 'lavender',
-    description: 'Tone màu Violet & Berry mang phong cách sân khấu biểu diễn âm nhạc K-Pop.'
+    description: 'Tone màu Tím hiện đại, phong cách và giàu năng lượng.'
   },
   'young-adult': {
     label: '18 - 25 tuổi (Sinh viên / Giới trẻ)',
-    sub: 'Hiện đại, lãng mạn Seoul & tươi mới',
+    sub: 'Tươi mới, ngọt ngào & thanh lịch',
     emoji: '🎓',
     recommendedTheme: 'cherry',
-    description: 'Tone màu hoa anh đào Seoul thanh lịch, trẻ trung và tràn đầy cảm hứng học tập.'
+    description: 'Tone màu Hồng trẻ trung, dịu dàng và tràn đầy cảm hứng học tập.'
   },
   adult: {
     label: '25 - 45 tuổi (Người đi làm)',
-    sub: 'Trang nhã, thư thái dịu mắt & tập trung cao',
+    sub: 'Trang nhã, thư thái dịu mắt & tập trung',
     emoji: '💼',
     recommendedTheme: 'mint',
-    description: 'Tone màu trà xanh đảo Jeju giảm căng thẳng thị giác, tối ưu cho việc học sau giờ làm việc.'
+    description: 'Tone màu Xanh Lá dịu mắt, giảm căng thẳng khi học tập.'
   },
   senior: {
     label: 'Trên 45 tuổi (Trung niên & Trưởng thành)',
-    sub: 'Tương phản cao, chữ to rõ & quý phái',
+    sub: 'Tương phản cao, chữ to rõ & dễ đọc',
     emoji: '🍵',
     recommendedTheme: 'gold',
-    description: 'Tone màu vàng kim Hanbok quý phái, độ tương phản sắc nét, bảo vệ mắt và dễ đọc.'
+    description: 'Tone màu Vàng rõ nét, độ tương phản sắc bén, rất dễ đọc.'
   }
 };
 

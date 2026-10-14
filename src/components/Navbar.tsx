@@ -319,6 +319,14 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={() => onTabChange('games')}
+              className="px-2.5 py-0.5 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+              title="Tạo phòng thi đấu trò chơi mới (có mật mã & không giới hạn người)"
+            >
+              <Plus className="w-3 h-3 stroke-[3]" />
+              <span>Tạo Phòng</span>
+            </button>
+            <button
+              onClick={() => onTabChange('games')}
               className="px-2 py-0.5 rounded-lg bg-stone-50 hover:bg-pink-50 border border-stone-200 hover:border-pink-300 text-stone-800 hover:text-pink-700 font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
               title="Vào phòng Đại Chiến TOPIK I Sơ Cấp (Mã: HANU-TOPIK)"
             >

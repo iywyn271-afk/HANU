@@ -319,7 +319,7 @@ export const OwnerGrammarModal: React.FC<OwnerGrammarModalProps> = ({
                   >
                     {[1, 2, 3, 4, 5, 6].map((l) => (
                       <option key={l} value={l}>
-                        Cấp độ {l} {l === 1 ? '(Sơ cấp 1)' : l === 2 ? '(Sơ cấp 2)' : l <= 4 ? '(Trung cấp)' : '(Cao cấp)'}
+                        Cấp {l}
                       </option>
                     ))}
                   </select>

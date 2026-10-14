@@ -273,7 +273,7 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
           </div>
 
           <h1 className="text-2xl sm:text-4xl font-extrabold text-stone-900 tracking-tight mb-3">
-            Lộ trình học tiếng Hàn từ <span className="text-pink-600">Cấp độ 1</span> đến <span className="text-emerald-600">Cấp độ 6</span>
+            Lộ trình học tiếng Hàn từ <span className="text-pink-600">Cấp 1</span> đến <span className="text-emerald-600">Cấp 6</span>
           </h1>
 
           <p className="text-stone-600 text-base sm:text-lg leading-relaxed mb-6">
@@ -384,10 +384,7 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="px-2.5 py-0.5 rounded-full bg-pink-100 text-pink-800 text-xs font-bold">
-                Cấp độ {currentLevelInfo.level}
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">
-                {currentLevelInfo.badge}
+                Cấp {currentLevelInfo.level}
               </span>
             </div>
             <h3 className="text-xl sm:text-2xl font-bold text-stone-900">

@@ -455,12 +455,12 @@ export const OwnerVocabModal: React.FC<OwnerVocabModalProps> = ({
                   onChange={(e) => setLevel(Number(e.target.value))}
                   className="w-full px-3.5 py-2 rounded-xl border border-stone-200 bg-stone-50 focus:bg-white focus:border-pink-500 focus:outline-hidden text-xs font-bold text-stone-800 transition-all cursor-pointer"
                 >
-                  <option value={1}>Cấp 1 - Sơ cấp 1 (Khởi đầu)</option>
-                  <option value={2}>Cấp 2 - Sơ cấp 2 (Giao tiếp cơ bản)</option>
-                  <option value={3}>Cấp 3 - Trung cấp 1 (Tự nhiên)</option>
-                  <option value={4}>Cấp 4 - Trung cấp 2 (Lưu loát)</option>
-                  <option value={5}>Cấp 5 - Cao cấp 1 (Chuyên nghiệp)</option>
-                  <option value={6}>Cấp 6 - Cao cấp 2 (Thành thạo)</option>
+                  <option value={1}>Cấp 1</option>
+                  <option value={2}>Cấp 2</option>
+                  <option value={3}>Cấp 3</option>
+                  <option value={4}>Cấp 4</option>
+                  <option value={5}>Cấp 5</option>
+                  <option value={6}>Cấp 6</option>
                 </select>
               </div>
 

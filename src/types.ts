@@ -217,15 +217,30 @@ export interface SharedQuizSet {
   questions: QuizQuestion[];
   isCommunity?: boolean;
   defaultLeaderboard: QuizLeaderboardEntry[];
+  password?: string; // Mật mã phòng (nếu có)
+  hasPassword?: boolean;
+  isUnlimited?: boolean; // Không giới hạn người chơi
+  isCustomRoom?: boolean; // Phòng do người dùng tự tạo
+  createdAt?: string;
+  hostName?: string;
 }
 
-export interface QuizRoom {
+export interface CustomQuizRoom {
+  id: string;
   code: string;
-  quizSetId: string;
-  quizTitle: string;
+  title: string;
+  description: string;
+  icon: string;
+  difficulty: 'Dễ' | 'Trung bình' | 'Khó' | 'Thử thách';
+  category: string;
   createdBy: string;
   createdAt: string;
-  participants: QuizLeaderboardEntry[];
+  password?: string;
+  hasPassword: boolean;
+  isUnlimited: boolean;
+  questions: QuizQuestion[];
+  leaderboard: QuizLeaderboardEntry[];
+  participantsCount: number;
 }
 
 

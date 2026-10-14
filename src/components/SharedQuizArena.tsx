@@ -19,12 +19,18 @@ import {
   HelpCircle,
   Plus,
   Send,
-  Hash
+  Hash,
+  Lock,
+  Unlock,
+  Key,
+  ShieldCheck,
+  Crown
 } from 'lucide-react';
 import { SharedQuizSet, QuizLeaderboardEntry, QuizQuestion, ThemeId } from '../types';
-import { SHARED_QUIZ_SETS, getSharedQuizByCode } from '../data/sharedQuizzesData';
+import { SHARED_QUIZ_SETS } from '../data/sharedQuizzesData';
 import { getThemeConfig } from '../data/themeData';
 import { playClickSound, playCorrectSound, playWrongSound, playFanfareSound, speakKorean } from '../utils/audio';
+import { CreateRoomModal } from './CreateRoomModal';
 import confetti from 'canvas-confetti';
 
 interface SharedQuizArenaProps {
@@ -37,6 +43,8 @@ interface SharedQuizArenaProps {
   onOpenCreateQuiz?: () => void;
 }
 
+const CUSTOM_ROOMS_STORAGE_KEY = 'hanu_custom_quiz_rooms_v1';
+
 export const SharedQuizArena: React.FC<SharedQuizArenaProps> = ({
   playerName,
   playerAvatar,
@@ -47,6 +55,37 @@ export const SharedQuizArena: React.FC<SharedQuizArenaProps> = ({
   onOpenCreateQuiz
 }) => {
   const themeConfig = getThemeConfig(themeId);
+
+  // Custom User Created Rooms
+  const [customRooms, setCustomRooms] = useState<SharedQuizSet[]>(() => {
+    try {
+      const saved = localStorage.getItem(CUSTOM_ROOMS_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch {}
+    return [];
+  });
+
+  // Sync custom rooms to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(CUSTOM_ROOMS_STORAGE_KEY, JSON.stringify(customRooms));
+    } catch {}
+  }, [customRooms]);
+
+  // Combined rooms
+  const allRooms: SharedQuizSet[] = [...customRooms, ...SHARED_QUIZ_SETS];
+
+  // Room Filter Tab
+  const [filterTab, setFilterTab] = useState<'all' | 'custom' | 'community'>('all');
+
+  // Modals state
+  const [isCreateRoomModalOpen, setIsCreateRoomModalOpen] = useState(false);
+  const [passwordPromptRoom, setPasswordPromptRoom] = useState<SharedQuizSet | null>(null);
+  const [enteredPassword, setEnteredPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
   // Arena State
   const [activeSet, setActiveSet] = useState<SharedQuizSet | null>(null);
@@ -84,9 +123,36 @@ export const SharedQuizArena: React.FC<SharedQuizArenaProps> = ({
     };
   }, [isPlaying, showResults]);
 
+  // Request to start a room (checks password if needed)
+  const handleRequestStartQuiz = (set: SharedQuizSet) => {
+    playClickSound();
+    if (set.hasPassword && set.password) {
+      setPasswordPromptRoom(set);
+      setEnteredPassword('');
+      setPasswordError('');
+    } else {
+      handleStartQuiz(set);
+    }
+  };
+
+  // Confirm Room Password
+  const handleConfirmPassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!passwordPromptRoom) return;
+
+    if (enteredPassword.trim() === (passwordPromptRoom.password || '')) {
+      playCorrectSound();
+      const target = passwordPromptRoom;
+      setPasswordPromptRoom(null);
+      handleStartQuiz(target);
+    } else {
+      playWrongSound();
+      setPasswordError('Mật mã phòng không chính xác! Vui lòng hỏi lại chủ phòng.');
+    }
+  };
+
   // Start a Quiz Set
   const handleStartQuiz = (set: SharedQuizSet) => {
-    playClickSound();
     setActiveSet(set);
     setCurrentIndex(0);
     setSelectedOption(null);
@@ -96,7 +162,7 @@ export const SharedQuizArena: React.FC<SharedQuizArenaProps> = ({
     setElapsedSeconds(0);
     setShowResults(false);
     setIsPlaying(true);
-    setLeaderboard([...set.defaultLeaderboard]);
+    setLeaderboard([...(set.defaultLeaderboard || [])]);
     setErrorMessage('');
   };
 
@@ -104,16 +170,16 @@ export const SharedQuizArena: React.FC<SharedQuizArenaProps> = ({
   const handleJoinByCode = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setErrorMessage('');
-    const code = inputRoomCode.trim();
+    const code = inputRoomCode.trim().toUpperCase();
     if (!code) {
       setErrorMessage('Vui lòng nhập mã phòng hoặc mã đề thi (ví dụ: HANU-TOPIK)!');
       return;
     }
 
-    const found = getSharedQuizByCode(code);
+    const found = allRooms.find(r => r.code.toUpperCase() === code || r.id.toUpperCase() === code);
     if (found) {
-      handleStartQuiz(found);
       setInputRoomCode('');
+      handleRequestStartQuiz(found);
     } else {
       setErrorMessage(`Không tìm thấy phòng thi nào có mã "${code}". Vui lòng thử lại!`);
     }
@@ -155,7 +221,6 @@ export const SharedQuizArena: React.FC<SharedQuizArenaProps> = ({
       setIsAnswerChecked(false);
       setIsAnswerCorrect(false);
     } else {
-      // Finish Quiz & Compute Leaderboard placement
       finishQuiz();
     }
   };
@@ -180,7 +245,7 @@ export const SharedQuizArena: React.FC<SharedQuizArenaProps> = ({
     };
 
     // Sort leaderboard by score desc, then timeSpentSeconds asc
-    const merged = [userEntry, ...activeSet.defaultLeaderboard].sort((a, b) => {
+    const merged = [userEntry, ...(activeSet.defaultLeaderboard || [])].sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score;
       return a.timeSpentSeconds - b.timeSpentSeconds;
     });
@@ -189,17 +254,37 @@ export const SharedQuizArena: React.FC<SharedQuizArenaProps> = ({
     setShowResults(true);
     setIsPlaying(false);
 
+    // If it's a custom room, update its leaderboard in local storage
+    if (activeSet.isCustomRoom) {
+      setCustomRooms(prev => prev.map(r => {
+        if (r.id === activeSet.id) {
+          return {
+            ...r,
+            participantsCount: (r.participantsCount || 1) + 1,
+            defaultLeaderboard: merged
+          };
+        }
+        return r;
+      }));
+    }
+
     playFanfareSound();
     confetti({
-      particleCount: 70,
+      particleCount: 75,
       spread: 80,
       origin: { y: 0.6 }
     });
   };
 
-  const handleCopyRoomCode = (code: string) => {
+  const handleCopyRoomInvite = (set: SharedQuizSet) => {
     playClickSound();
-    navigator.clipboard.writeText(code);
+    const text = `🎮 THÁCH ĐẤU QUIZ TIẾNG HÀN: ${set.title}
+🔑 Mã phòng: ${set.code}
+${set.hasPassword ? `🔒 Mật mã phòng: ${set.password}` : '🌐 Mật mã: Mở tự do (Không cần mật mã)'}
+👥 Số lượng: Không giới hạn người tham gia!
+👉 Mở tab "Trò chơi" -> Nhập mã "${set.code}" để thi đua top ngay!`;
+
+    navigator.clipboard.writeText(text);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
   };
@@ -208,6 +293,13 @@ export const SharedQuizArena: React.FC<SharedQuizArenaProps> = ({
     playClickSound();
     speakKorean(text, speechRate);
   };
+
+  // Filtered rooms list
+  const displayedRooms = allRooms.filter(r => {
+    if (filterTab === 'custom') return r.isCustomRoom;
+    if (filterTab === 'community') return !r.isCustomRoom;
+    return true;
+  });
 
   return (
     <div className="space-y-6 animate-fadeIn">
@@ -227,7 +319,7 @@ export const SharedQuizArena: React.FC<SharedQuizArenaProps> = ({
               Phòng Thi Chung & Đấu Trường Quiz
             </span>
             <span className="text-[11px] font-semibold bg-white/10 px-2 py-0.5 rounded-full">
-              Cùng dùng cho nhiều người
+              ♾️ Không giới hạn người chơi
             </span>
           </div>
 
@@ -235,29 +327,43 @@ export const SharedQuizArena: React.FC<SharedQuizArenaProps> = ({
             Thách Đấu & Cùng Làm Quiz Tiếng Hàn
           </h2>
           <p className="text-xs sm:text-sm text-white/90 mt-1 leading-relaxed">
-            Chọn bộ đề chuẩn hóa có sẵn hoặc nhập <strong>Mã Phòng Thi</strong> để cùng bạn bè và cộng đồng đua top điểm số trên Bảng Vàng!
+            Chọn phòng thi có sẵn, tự <strong>Tạo phòng mới (có mật mã bảo vệ)</strong> hoặc nhập <strong>Mã Phòng</strong> để cùng bạn bè đua top bảng vàng!
           </p>
 
-          {/* Quick Join Room Input */}
-          <form onSubmit={handleJoinByCode} className="mt-4 flex items-center gap-2 max-w-md">
-            <div className="relative flex-1">
-              <Hash className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Nhập mã phòng (ví dụ: HANU-TOPIK, KPOP-VIBE)..."
-                value={inputRoomCode}
-                onChange={(e) => setInputRoomCode(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 rounded-xl bg-white text-stone-900 text-xs sm:text-sm font-bold uppercase placeholder:normal-case placeholder:font-normal focus:outline-hidden shadow-xs"
-              />
-            </div>
+          {/* Quick Join & Create Room Action Row */}
+          <div className="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+            <form onSubmit={handleJoinByCode} className="flex-1 flex items-center gap-2 max-w-md">
+              <div className="relative flex-1">
+                <Hash className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Nhập mã phòng (ví dụ: HANU-TOPIK, KPOP-VIBE)..."
+                  value={inputRoomCode}
+                  onChange={(e) => setInputRoomCode(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-white text-stone-900 text-xs sm:text-sm font-bold uppercase placeholder:normal-case placeholder:font-normal focus:outline-hidden shadow-xs"
+                />
+              </div>
+              <button
+                type="submit"
+                className="px-4 py-2 rounded-xl bg-stone-900 hover:bg-black text-white text-xs font-black shadow-xs flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+              >
+                <span>Vào thi</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </form>
+
             <button
-              type="submit"
-              className="px-4 py-2 rounded-xl bg-stone-900 hover:bg-black text-white text-xs font-black shadow-xs flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+              type="button"
+              onClick={() => {
+                playClickSound();
+                setIsCreateRoomModalOpen(true);
+              }}
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-stone-950 font-black text-xs shadow-md flex items-center justify-center gap-1.5 transition-all cursor-pointer shrink-0 border border-amber-200"
             >
-              <span>Vào thi</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <Plus className="w-4 h-4 stroke-[3]" />
+              <span>TẠO PHÒNG MỚI (CÓ MẬT MÃ)</span>
             </button>
-          </form>
+          </div>
 
           {errorMessage && (
             <p className="text-xs font-bold bg-white/20 backdrop-blur-xs text-rose-100 p-2 rounded-xl mt-2 inline-block">
@@ -267,6 +373,70 @@ export const SharedQuizArena: React.FC<SharedQuizArenaProps> = ({
         </div>
       </div>
 
+      {/* PASSWORD ENTRY MODAL (When room has password) */}
+      {passwordPromptRoom && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fadeIn">
+          <div 
+            className="bg-white rounded-3xl border border-stone-200 shadow-2xl max-w-sm w-full p-6 space-y-4 animate-fadeIn"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-center space-y-2">
+              <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto shadow-xs">
+                <Lock className="w-6 h-6" />
+              </div>
+              <h3 className="text-base sm:text-lg font-black text-stone-900">
+                Phòng Thi Yêu Cầu Mật Mã
+              </h3>
+              <p className="text-xs text-stone-500">
+                Phòng <strong>"{passwordPromptRoom.title}"</strong> (Mã: {passwordPromptRoom.code}) được bảo vệ bằng mật khẩu.
+              </p>
+            </div>
+
+            <form onSubmit={handleConfirmPassword} className="space-y-3">
+              <div>
+                <label className="text-xs font-bold text-stone-700 block mb-1">
+                  Nhập mật mã phòng:
+                </label>
+                <div className="relative">
+                  <Key className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="password"
+                    autoFocus
+                    required
+                    placeholder="Mật mã phòng..."
+                    value={enteredPassword}
+                    onChange={(e) => setEnteredPassword(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-stone-200 text-xs sm:text-sm font-bold focus:outline-hidden focus:border-amber-500"
+                  />
+                </div>
+              </div>
+
+              {passwordError && (
+                <p className="text-xs font-bold text-rose-600 bg-rose-50 p-2 rounded-xl">
+                  ⚠️ {passwordError}
+                </p>
+              )}
+
+              <div className="flex items-center gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setPasswordPromptRoom(null)}
+                  className="flex-1 py-2 rounded-xl border border-stone-200 text-stone-600 hover:bg-stone-50 font-bold text-xs"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black text-xs shadow-xs"
+                >
+                  Xác nhận & Vào thi
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* VIEW 1: ACTIVE QUIZ IN PROGRESS */}
       {isPlaying && activeSet && !showResults && (
         <div className="bg-white rounded-3xl border border-stone-200 p-5 sm:p-7 shadow-xs space-y-6 animate-fadeIn">
@@ -275,15 +445,24 @@ export const SharedQuizArena: React.FC<SharedQuizArenaProps> = ({
             <div className="flex items-center gap-2.5">
               <span className="text-2xl">{activeSet.icon}</span>
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="font-black text-stone-900 text-sm sm:text-base">
                     {activeSet.title}
                   </h3>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-stone-100 border border-stone-200 text-stone-700">
-                    Phòng: {activeSet.code}
+                    Mã: {activeSet.code}
+                  </span>
+                  {activeSet.hasPassword && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 border border-amber-200 text-amber-800 flex items-center gap-1">
+                      <Lock className="w-2.5 h-2.5" />
+                      <span>Có mật mã</span>
+                    </span>
+                  )}
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    ♾️ Không giới hạn người
                   </span>
                 </div>
-                <p className="text-xs text-stone-500">
+                <p className="text-xs text-stone-500 mt-0.5">
                   Câu hỏi {currentIndex + 1} / {activeSet.questions.length} • Điểm hiện tại: {userScore}
                 </p>
               </div>
@@ -481,7 +660,9 @@ export const SharedQuizArena: React.FC<SharedQuizArenaProps> = ({
               Hoàn Thành Đề Thi: {activeSet.title}
             </h3>
             <p className="text-xs text-stone-500">
-              Mã phòng thi: <strong className="text-stone-800">{activeSet.code}</strong> • Thời gian làm bài: <strong>{elapsedSeconds}s</strong>
+              Mã phòng: <strong className="text-stone-800 font-mono">{activeSet.code}</strong> • 
+              {activeSet.hasPassword && <span className="ml-1 text-amber-700 font-bold">🔒 Có mật mã •</span>}
+              <span className="ml-1 text-emerald-700 font-bold">♾️ Không giới hạn người</span>
             </p>
 
             <div className="inline-flex items-center gap-3 p-3 rounded-2xl bg-stone-50 border border-stone-200 mt-2">
@@ -503,28 +684,34 @@ export const SharedQuizArena: React.FC<SharedQuizArenaProps> = ({
           </div>
 
           {/* Share Room Code Bar */}
-          <div className="p-4 rounded-2xl bg-pink-50/60 border border-pink-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-pink-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
                 <Share2 className="w-4 h-4" />
               </div>
               <div>
-                <span className="text-xs font-black text-pink-900 block">
+                <span className="text-xs font-black text-stone-900 block">
                   Chia sẻ phòng thi cho bạn bè cùng đua điểm:
                 </span>
-                <span className="text-xs text-stone-600 font-mono font-bold">
-                  Mã phòng: <span className="text-pink-600">{activeSet.code}</span>
-                </span>
+                <div className="flex items-center gap-2 text-xs text-stone-600 font-mono flex-wrap">
+                  <span>Mã phòng: <strong className="text-pink-600 font-black">{activeSet.code}</strong></span>
+                  {activeSet.hasPassword && (
+                    <span className="text-amber-800 bg-amber-100 px-1.5 py-0.2 rounded font-bold">
+                      Mật mã: {activeSet.password}
+                    </span>
+                  )}
+                  <span className="text-emerald-700 font-sans font-bold">♾️ Không giới hạn người</span>
+                </div>
               </div>
             </div>
 
             <button
               type="button"
-              onClick={() => handleCopyRoomCode(activeSet.code)}
-              className="px-4 py-2 rounded-xl bg-white hover:bg-stone-50 border border-pink-300 text-pink-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs self-start sm:self-auto shrink-0"
+              onClick={() => handleCopyRoomInvite(activeSet)}
+              className="px-4 py-2 rounded-xl bg-white hover:bg-stone-50 border border-amber-300 text-amber-800 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs self-start sm:self-auto shrink-0"
             >
               {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copiedLink ? 'Đã chép mã phòng!' : 'Sao chép mã phòng'}</span>
+              <span>{copiedLink ? 'Đã chép thông tin phòng!' : 'Sao chép mã & mật khẩu'}</span>
             </button>
           </div>
 
@@ -533,12 +720,12 @@ export const SharedQuizArena: React.FC<SharedQuizArenaProps> = ({
             <div className="flex items-center justify-between">
               <h4 className="text-sm font-black text-stone-900 flex items-center gap-2">
                 <Trophy className="w-4 h-4 text-amber-500" />
-                <span>Bảng Xếp Hạng Phòng Thi ({leaderboard.length} người tham gia)</span>
+                <span>Bảng Xếp Hạng Phòng Thi ({leaderboard.length} người • Không giới hạn ♾️)</span>
               </h4>
               <span className="text-[11px] text-stone-400">Xếp hạng theo điểm & thời gian</span>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
               {leaderboard.map((item, index) => {
                 const isCurrentUser = item.isCurrentUser;
                 const isTop1 = index === 0;
@@ -615,7 +802,7 @@ export const SharedQuizArena: React.FC<SharedQuizArenaProps> = ({
               }}
               className="px-4 py-2 rounded-xl border border-stone-200 text-stone-700 font-bold text-xs hover:bg-stone-50 transition-colors cursor-pointer"
             >
-              ← Chọn đề thi khác
+              ← Chọn phòng khác
             </button>
 
             <button
@@ -633,39 +820,94 @@ export const SharedQuizArena: React.FC<SharedQuizArenaProps> = ({
         </div>
       )}
 
-      {/* VIEW 3: BROWSE ALL SHARED QUIZ SETS */}
+      {/* VIEW 3: BROWSE ALL SHARED QUIZ SETS & ROOMS */}
       {!isPlaying && !showResults && (
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="text-lg font-black text-stone-900 flex items-center gap-2">
-                <span>Kho Đề Thi Cùng Dùng Cho Cộng Đồng</span>
+                <span>Kho Phòng Thi & Đấu Trường Quiz</span>
                 <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-pink-100 text-pink-700">
-                  {SHARED_QUIZ_SETS.length} bộ đề chuẩn
+                  {allRooms.length} phòng thi
                 </span>
               </h3>
               <p className="text-xs text-stone-500">
-                Chọn một đề thi bên dưới để bắt đầu làm bài và ghi danh trên bảng xếp hạng phòng thi.
+                Tham gia phòng thi có sẵn hoặc tạo phòng riêng có mật mã để mời bạn bè không giới hạn số người!
               </p>
             </div>
 
-            {onOpenCreateQuiz && (
+            <div className="flex items-center gap-2 flex-wrap">
               <button
                 type="button"
-                onClick={onOpenCreateQuiz}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition-all cursor-pointer self-start sm:self-auto shrink-0"
+                onClick={() => {
+                  playClickSound();
+                  setIsCreateRoomModalOpen(true);
+                }}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white font-black text-xs shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
               >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Tạo thêm Quiz mới</span>
+                <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                <span>TẠO PHÒNG MỚI (CÓ MẬT MÃ)</span>
               </button>
-            )}
+
+              {onOpenCreateQuiz && (
+                <button
+                  type="button"
+                  onClick={onOpenCreateQuiz}
+                  className="px-3.5 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs flex items-center gap-1 transition-all cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Tạo Quiz</span>
+                </button>
+              )}
+            </div>
           </div>
 
+          {/* Filter Pills */}
+          <div className="flex items-center gap-1.5 p-1 bg-stone-100 rounded-xl border border-stone-200 w-fit text-xs font-bold">
+            <button
+              onClick={() => {
+                playClickSound();
+                setFilterTab('all');
+              }}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                filterTab === 'all' ? 'bg-white text-stone-900 shadow-2xs' : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              Tất cả phòng ({allRooms.length})
+            </button>
+            <button
+              onClick={() => {
+                playClickSound();
+                setFilterTab('custom');
+              }}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1 ${
+                filterTab === 'custom' ? 'bg-white text-amber-900 shadow-2xs' : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <Crown className="w-3 h-3 text-amber-500" />
+              <span>Phòng bạn tạo ({customRooms.length})</span>
+            </button>
+            <button
+              onClick={() => {
+                playClickSound();
+                setFilterTab('community');
+              }}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                filterTab === 'community' ? 'bg-white text-stone-900 shadow-2xs' : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              Phòng chuẩn ({SHARED_QUIZ_SETS.length})
+            </button>
+          </div>
+
+          {/* Rooms Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {SHARED_QUIZ_SETS.map((quizSet) => (
+            {displayedRooms.map((quizSet) => (
               <div
                 key={quizSet.id}
-                className="bg-white rounded-3xl border border-stone-200 hover:border-pink-300 p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group space-y-4"
+                className={`bg-white rounded-3xl border transition-all flex flex-col justify-between group space-y-4 p-5 shadow-xs hover:shadow-md ${
+                  quizSet.isCustomRoom ? 'border-amber-300 ring-1 ring-amber-200' : 'border-stone-200 hover:border-pink-300'
+                }`}
               >
                 <div className="space-y-2.5">
                   <div className="flex items-start justify-between gap-2">
@@ -674,16 +916,38 @@ export const SharedQuizArena: React.FC<SharedQuizArenaProps> = ({
                         {quizSet.icon}
                       </span>
                       <div>
-                        <h4 className="text-sm sm:text-base font-black text-stone-900 group-hover:text-pink-600 transition-colors">
-                          {quizSet.title}
-                        </h4>
-                        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-stone-100 text-stone-700 border border-stone-200">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <h4 className="text-sm sm:text-base font-black text-stone-900 group-hover:text-pink-600 transition-colors">
+                            {quizSet.title}
+                          </h4>
+                          {quizSet.isCustomRoom && (
+                            <span className="text-[10px] font-black px-1.5 py-0.2 rounded-md bg-amber-500 text-white">
+                              Phòng Bạn Tạo
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-stone-100 text-stone-700 border border-stone-200 font-mono">
                             Mã: {quizSet.code}
                           </span>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            {quizSet.difficulty}
+
+                          {quizSet.hasPassword ? (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1">
+                              <Lock className="w-3 h-3 text-amber-700" />
+                              <span>Có mật mã</span>
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+                              <Unlock className="w-3 h-3 text-emerald-600" />
+                              <span>Mở tự do</span>
+                            </span>
+                          )}
+
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-50 text-sky-800 border border-sky-200">
+                            ♾️ Không giới hạn người
                           </span>
+
                           <span className="text-[10px] text-stone-400">
                             • {quizSet.questionsCount} câu hỏi
                           </span>
@@ -700,26 +964,26 @@ export const SharedQuizArena: React.FC<SharedQuizArenaProps> = ({
                 <div className="pt-3 border-t border-stone-100 flex items-center justify-between gap-2 flex-wrap">
                   <div className="flex items-center gap-1.5 text-xs text-stone-500">
                     <Users className="w-3.5 h-3.5 text-stone-400" />
-                    <span>{quizSet.participantsCount.toLocaleString()} lượt tham gia</span>
+                    <span>{quizSet.participantsCount.toLocaleString()} người đã tham gia</span>
                   </div>
 
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
-                      onClick={() => handleCopyRoomCode(quizSet.code)}
+                      onClick={() => handleCopyRoomInvite(quizSet)}
                       className="p-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 transition-colors cursor-pointer"
-                      title={`Sao chép mã phòng ${quizSet.code}`}
+                      title="Sao chép lời mời & mật mã phòng để gửi bạn bè"
                     >
-                      <Copy className="w-3.5 h-3.5" />
+                      <Share2 className="w-3.5 h-3.5" />
                     </button>
 
                     <button
                       type="button"
-                      onClick={() => handleStartQuiz(quizSet)}
+                      onClick={() => handleRequestStartQuiz(quizSet)}
                       className="px-4 py-2 rounded-xl bg-stone-900 hover:bg-black text-white font-extrabold text-xs shadow-xs flex items-center gap-1.5 transition-all cursor-pointer group-hover:bg-pink-600"
                     >
-                      <Play className="w-3.5 h-3.5 fill-white" />
-                      <span>Vào thi ngay</span>
+                      {quizSet.hasPassword ? <Lock className="w-3.5 h-3.5 text-amber-300" /> : <Play className="w-3.5 h-3.5 fill-white" />}
+                      <span>{quizSet.hasPassword ? 'Nhập mã vào thi' : 'Vào thi ngay'}</span>
                     </button>
                   </div>
                 </div>
@@ -728,6 +992,17 @@ export const SharedQuizArena: React.FC<SharedQuizArenaProps> = ({
           </div>
         </div>
       )}
+
+      {/* CREATE ROOM MODAL */}
+      <CreateRoomModal
+        isOpen={isCreateRoomModalOpen}
+        onClose={() => setIsCreateRoomModalOpen(false)}
+        playerName={playerName}
+        onRoomCreated={(newRoom) => {
+          setCustomRooms(prev => [newRoom, ...prev]);
+        }}
+        customQuizzes={customQuizzes}
+      />
     </div>
   );
 };
