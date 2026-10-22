@@ -100,7 +100,7 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
 
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-xs text-stone-500 font-medium">Sẵn sàng học tập cùng KOREAN IS EASY</span>
+              <span className="text-xs text-stone-500 font-medium">Sẵn sàng học tập cùng HANU 하누</span>
             </div>
           </div>
 

@@ -86,19 +86,23 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-2.5 border-b border-stone-100 gap-2 flex-wrap">
           {/* Logo & Brand */}
-          <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => onTabChange('roadmap')}>
+          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => onTabChange('roadmap')}>
             <div 
-              className="w-10 h-10 rounded-xl text-white flex items-center justify-center font-bold text-xl shadow-xs ring-2 transition-all duration-300"
+              className="w-11 h-11 rounded-2xl overflow-hidden shadow-sm ring-2 transition-all duration-300 group-hover:scale-105 shrink-0 bg-pink-100/50"
               style={{
-                background: `linear-gradient(135deg, ${themeConfig.gradientFrom}, ${themeConfig.gradientTo})`,
-                ringColor: `${themeConfig.accentColor}30`
+                borderColor: `${themeConfig.accentColor}40`,
+                boxShadow: `0 2px 10px ${themeConfig.accentColor}25`
               }}
             >
-              <span className="font-korean">한</span>
+              <img 
+                src="/logo.jpg" 
+                alt="HANU 하누 Logo" 
+                className="w-full h-full object-cover object-center"
+              />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-xl font-black tracking-tight text-stone-900 flex items-center gap-1">
+                <span className="text-xl font-black tracking-tight text-stone-900 flex items-center gap-1.5">
                   HANU 
                   <span 
                     className="text-xs font-bold font-korean px-1.5 py-0.5 rounded-md border"
@@ -108,7 +112,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       borderColor: `${themeConfig.accentColor}30`
                     }}
                   >
-                    한국어
+                    하누
                   </span>
                 </span>
                 <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -120,6 +124,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </p>
             </div>
           </div>
+
 
           {/* User Live Stats Counter & Controls */}
           <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">

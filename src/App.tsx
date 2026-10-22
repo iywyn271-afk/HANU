@@ -738,14 +738,19 @@ export default function App() {
       {/* Footer */}
       <footer className="border-t border-stone-200 bg-white/80 py-6 mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
+            <img 
+              src="/logo.jpg" 
+              alt="HANU" 
+              className="w-6 h-6 rounded-lg object-cover shadow-2xs" 
+            />
             <span className="font-extrabold text-stone-900 tracking-tight">
               HANU 
               <span 
-                className="font-korean font-semibold text-xs ml-0.5"
+                className="font-korean font-semibold text-xs ml-1"
                 style={{ color: currentThemeConfig.accentColor }}
               >
-                한국어
+                하누
               </span>
             </span>
             <span>• Học tiếng Hàn trực quan Cấp độ 1 đến 6</span>

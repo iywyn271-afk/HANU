@@ -118,18 +118,26 @@ export const OnboardingSurveyModal: React.FC<OnboardingSurveyModalProps> = ({
             <X className="w-5 h-5" />
           </button>
 
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="p-1 rounded-lg bg-white/20 text-sm">
-              <Sparkles className="w-4 h-4 text-white" />
-            </span>
-            <span className="text-xs font-bold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full">
-              Khảo Sát Cá Nhân Hóa & Màu Sắc
-            </span>
+          <div className="flex items-center gap-3.5 mb-2">
+            <img 
+              src="/logo.jpg" 
+              alt="HANU 하누" 
+              className="w-12 h-12 rounded-2xl border-2 border-white/50 shadow-md object-cover shrink-0" 
+            />
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="p-1 rounded-lg bg-white/20 text-sm">
+                  <Sparkles className="w-3.5 h-3.5 text-white" />
+                </span>
+                <span className="text-[11px] font-bold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full">
+                  Khảo Sát Cá Nhân Hóa & Màu Sắc
+                </span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black tracking-tight leading-tight">
+                Chào mừng bạn đến với HANU 하누!
+              </h3>
+            </div>
           </div>
-
-          <h3 className="text-xl sm:text-2xl font-black tracking-tight">
-            Chào mừng bạn đến với HANU 한국어!
-          </h3>
           <p className="text-xs text-white/90 mt-1">
             Chọn độ tuổi và mục tiêu để HANU tối ưu lộ trình và giao diện màu phù hợp nhất với bạn.
           </p>
